@@ -1,0 +1,67 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+bool provera(const vector<bool>& obradjen)
+{
+    for(int i=0; i<(int)obradjen.size(); i++){
+        if(!obradjen[i]) return true;
+    }
+    return false;
+}
+
+int indeks(const vector<int>& cene, const vector<bool> obradjen)
+{
+    if(!provera(obradjen)) return 0;
+    int minimalnaCena=INT_MAX, ind;
+    for(int i=0; i<(int) cene.size(); i++){
+        if(!obradjen[i]){
+            if(cene[i]<minimalnaCena){
+                minimalnaCena = cene[i];
+                ind = i;
+            }
+        }
+    }
+    return ind;
+}
+
+int main()
+{
+    int brojCvorova, brojGrana;
+    cin >> brojCvorova >> brojGrana;
+    vector<vector<pair<int,int>>> veze(brojCvorova);
+    for(int i=0; i<brojGrana; i++){
+        int polazni, dolazni, tezina;
+        cin >> polazni >> dolazni >> tezina;
+        //polazni--;
+        //dolazni--;
+        pair<int, int> grana;
+        grana.first = dolazni;
+        grana.second = tezina;
+        veze[polazni].push_back(grana);
+    }
+
+    vector<int> cene(brojCvorova, INT_MAX);
+    vector<bool> obradjen(brojCvorova, false);
+    vector<string> putanja(brojCvorova,"");
+
+    int start;
+    cin >> start;
+    //start--;
+    cene[start]=0;
+    putanja[start]+=to_string(start);
+    while(provera(obradjen)){
+        for(pair<int,int> c : veze[start]){
+            if(cene[start]+c.second<cene[c.first]){
+                cene[c.first]=cene[start]+c.second;
+                putanja[c.first]=putanja[start]+to_string(c.first);
+            }
+        }
+        obradjen[start] = true;
+        start = indeks(cene, obradjen);
+    }
+    cout << "cvor" << "\t" << "putanja" << "\t" << "cena" << "\n";
+    for(int i = 0; i<brojCvorova; i++){
+        cout << i << "\t" << putanja[i] << "\t" << cene[i] << "\n";
+    }
+    return 0;
+}
